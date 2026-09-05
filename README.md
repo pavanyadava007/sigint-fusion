@@ -16,7 +16,7 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 ## Results
 
 <!-- results:start -->
-**All classifier numbers below come from the synthetic RadioML-layout dataset (`data/synth_mod.py`), not from DeepSig RadioML, which needs a licence. Re-run `scripts/run_experiments.sh` with `DATA_2016`/`DATA_2018` pointing at the real files to refresh them.**
+**Classifier numbers below come from the synthetic RadioML-layout dataset (`data/synth_mod.py`) unless a row says REAL. DeepSig RadioML needs a licence; the only real frames available were a single-SNR community mirror slice of 2016.10a, used for the synthetic-to-real transfer rows. Re-run `scripts/run_experiments.sh` with `DATA_2016`/`DATA_2018` pointing at the real files to refresh everything.**
 
 | Experiment | Result |
 |---|---|
@@ -27,6 +27,8 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 | ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | 50.5 % vs 71.6 % |
 | Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 78.3 % ± 3.8 (chance 33 %); embeddings from scratch model 80.2 %, random init 34.3 % |
 | Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 56.1 % · unseen devices 79.2 % ± 2.2 (chance 25 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 86.5 % ± 0.3 / 86.9 % ± 0.5 / 71.1 % ± 0.7 · transfer gain -0.4 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 71.7 % ± 1.1 / 75.8 % ± 0.8 / 66.1 % ± 0.9 · transfer gain -4.1 pp (chance 9 %) |
 | PDW deinterleaving (synthetic, 4 emitters, DBSCAN) | purity 1.00 / completeness 1.00 (tests/test_core.py) |
 | /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU | end-to-end p50 92.6 ms · p95 311.33 ms · p99 501.82 ms · 255.0 req/s · model-only p50 1.05 ms |
 | RAG retrieval, 53 questions, 37 chunks (BAAI/bge-small-en-v1.5) | hybrid hit@5 100.0 % · MRR 0.93 · dense-only hit@5 98.1 % |
@@ -84,7 +86,9 @@ Then measure: `make bench` (classify latency), `make rag-eval`, `make agent-eval
 `make report` (renders docs/results.md and the table above).
 
 To use a hosted LLM instead of Ollama set `LLM_BASE_URL`, `LLM_MODEL` and `OPENAI_API_KEY` in `.env`.
-To train on the real RadioML files: `DATA_2016=data/RML2016.10a_dict.pkl DATA_2018=data/GOLD_XYZ_OSC.0001_1024.hdf5 make train`.
+To train on the real RadioML files (register at deepsig.ai, put the two files in `ml-service/data/`):
+`DATA_2016=data/RML2016.10a_dict.pkl DATA_2018=data/GOLD_XYZ_OSC.0001_1024.hdf5 make train`.
+The real-frame transfer check uses a community mirror slice: `cd ml-service && python train_hf_rml2016.py` (parquet files in `data/hf_rml2016/`, see the script docstring for the download).
 
 ## Development
 
@@ -108,6 +112,9 @@ container, a tiny CPU training smoke of all three train modes, the Java build wi
   sensor so they merge instead of spawning duplicates.
 - **RAG decouples knowledge from weights.** Updating the catalogue is a re-ingest that takes seconds. Retrieval is hybrid
   because exact frequencies are literals, not semantics.
-- **Honesty.** Numbers are produced on a synthetic dataset when RadioML is absent and are labelled as such everywhere.
+- **Honesty.** Numbers are produced on a synthetic dataset when RadioML is absent and are labelled as such everywhere. The one
+  real-data check available (a single-SNR mirror slice of RadioML 2016.10a) is a negative result for synthetic pretraining:
+  from-scratch training on real frames is as good or better, and the frozen synthetic features reach only ~71 % vs ~87 %.
+  The synthetic channel model is therefore not a substitute for the licensed data; `train_hf_rml2016.py` documents the gap.
 
 See [docs/architecture.md](docs/architecture.md) for the ADRs and [docs/api.md](docs/api.md) for the HTTP contract.

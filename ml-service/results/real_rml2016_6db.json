@@ -1,0 +1,92 @@
+{
+ "mode": "real_transfer",
+ "name": "real_rml2016_6db",
+ "dataset": "RadioML 2016.10a frames, single-SNR slice, Hugging Face mirror hitrs909/RML2016 config 6db_0",
+ "n_train": 9900,
+ "n_val": 539,
+ "n_test": 1100,
+ "classes": 11,
+ "class_names": "not published by the mirror (label ids 0-10)",
+ "length": 128,
+ "epochs": 40,
+ "seeds": 3,
+ "init": "ckpt/pre.pt",
+ "runs": {
+  "scratch@1.0": {
+   "test_acc": [
+    0.8664,
+    0.8755,
+    0.8636
+   ],
+   "mean": 0.8685,
+   "std": 0.0051,
+   "n_train": 9900
+  },
+  "pretrained@1.0": {
+   "test_acc": [
+    0.8609,
+    0.8664,
+    0.8673
+   ],
+   "mean": 0.8649,
+   "std": 0.0028,
+   "n_train": 9900
+  },
+  "linear_probe@1.0": {
+   "test_acc": [
+    0.7036,
+    0.7082,
+    0.72
+   ],
+   "mean": 0.7106,
+   "std": 0.0069,
+   "n_train": 9900
+  },
+  "scratch@0.1": {
+   "test_acc": [
+    0.7491,
+    0.7582,
+    0.7682
+   ],
+   "mean": 0.7585,
+   "std": 0.0078,
+   "n_train": 990
+  },
+  "pretrained@0.1": {
+   "test_acc": [
+    0.7055,
+    0.7318,
+    0.7136
+   ],
+   "mean": 0.717,
+   "std": 0.011,
+   "n_train": 990
+  },
+  "linear_probe@0.1": {
+   "test_acc": [
+    0.6709,
+    0.6618,
+    0.6491
+   ],
+   "mean": 0.6606,
+   "std": 0.0089,
+   "n_train": 990
+  }
+ },
+ "chance": 0.0909,
+ "seconds": 253.2,
+ "data": "hf:hitrs909/RML2016 (6db_0)",
+ "synthetic": false,
+ "device": "NVIDIA L4",
+ "seed": 0,
+ "git": "eca0956",
+ "timestamp": "2026-09-05T19:17:55+00:00",
+ "args": {
+  "data": "hf:hitrs909/RML2016 (6db_0)",
+  "init": "ckpt/pre.pt",
+  "epochs": 40,
+  "seeds": 3,
+  "name": "real_rml2016_6db",
+  "seed": 0
+ }
+}

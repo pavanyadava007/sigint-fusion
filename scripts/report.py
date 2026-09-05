@@ -40,8 +40,9 @@ def main():
     rag = load("rag_eval") or _load_json(os.path.join(ROOT, "rag", "results", "rag_eval.json"))
     agent = _load_json(os.path.join(ROOT, "agent", "results", "agent_eval.json"))
     synthetic = ft is not None and ft.get("synthetic")
-    data_note = ("**All classifier numbers below come from the synthetic RadioML-layout dataset (`data/synth_mod.py`), not from DeepSig RadioML,"
-                 " which needs a licence. Re-run `scripts/run_experiments.sh` with `DATA_2016`/`DATA_2018` pointing at the real files to refresh them.**"
+    data_note = ("**Classifier numbers below come from the synthetic RadioML-layout dataset (`data/synth_mod.py`) unless a row says REAL. DeepSig RadioML"
+                 " needs a licence; the only real frames available were a single-SNR community mirror slice of 2016.10a, used for the synthetic-to-real"
+                 " transfer rows. Re-run `scripts/run_experiments.sh` with `DATA_2016`/`DATA_2018` pointing at the real files to refresh everything.**"
                  if synthetic else "Classifier numbers below come from the dataset recorded in each results JSON.")
     device = (ft or {}).get("device", "unknown GPU")
 
@@ -68,6 +69,18 @@ def main():
                      f"base val {pct(sei['base_val_acc'])} · unseen devices {pct(fn['acc_mean'])} ± {100 * fn['acc_std']:.1f} (chance 25 %)"))
     else:
         rows.append(("Specific emitter identification", "not run"))
+    real = load("real_rml2016_6db")
+    if real:
+        r = real["runs"]
+        for f in ("1.0", "0.1"):
+            sc, pr, lp = r[f"scratch@{f}"], r[f"pretrained@{f}"], r[f"linear_probe@{f}"]
+            label = (f"REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, {real['classes']} classes, {pr['n_train']} train frames = "
+                     f"{float(f) * 100:g} %), test acc over {real['seeds']} seeds: synthetic-pretrained / scratch / frozen linear probe")
+            rows.append((label,
+                         f"{pct(pr['mean'])} ± {100 * pr['std']:.1f} / {pct(sc['mean'])} ± {100 * sc['std']:.1f} / {pct(lp['mean'])} ± {100 * lp['std']:.1f}"
+                         f" · transfer gain {100 * (pr['mean'] - sc['mean']):+.1f} pp (chance {pct(real['chance'], 0)})"))
+    else:
+        rows.append(("Real RadioML 2016.10a frames (HF mirror slice)", "not run"))
     rows.append(("PDW deinterleaving (synthetic, 4 emitters, DBSCAN)", "purity 1.00 / completeness 1.00 (tests/test_core.py)"))
     if bench:
         e, m = bench["end_to_end_ms"], bench["model_only_ms"]

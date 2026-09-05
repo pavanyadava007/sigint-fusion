@@ -21,3 +21,4 @@ gateway-java/target/
 .env
 *.log
 .ipynb_checkpoints/
+ml-service/data/hf_rml2016/
