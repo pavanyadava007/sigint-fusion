@@ -25,7 +25,7 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 | Same, trained from scratch (no pretraining) | val top-1 74.9 % |
 | Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 69.3 % / 63.2 % / 65.8 % · pretrain gain +3.5 pp · BYOL gain -2.7 pp |
 | Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 51.4 % / 48.0 % / 46.9 % · pretrain gain +4.5 pp · BYOL gain +1.1 pp |
-| ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | not run |
+| ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | 48.6 % vs 75.7 % |
 | Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 87.6 % ± 4.3 (chance 33 %); embeddings from scratch model 86.7 %, random init 33.8 % |
 | Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 98.9 % · unseen devices 100.0 % ± 0.1 (chance 25 %) |
 
