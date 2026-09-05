@@ -16,10 +16,24 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 ## Results
 
 <!-- results:start -->
-**Classifier numbers below come from the synthetic RadioML-layout dataset (`data/synth_mod.py`) unless a row says REAL. DeepSig RadioML needs a licence; the only real frames available were a single-SNR community mirror slice of 2016.10a, used for the synthetic-to-real transfer rows. Re-run `scripts/run_experiments.sh` with `DATA_2016`/`DATA_2018` pointing at the real files to refresh everything.**
+**Real DeepSig RadioML** (`data/RML2016.10a_dict.pkl`; rows saying not run are still in progress)
 
 | Experiment | Result |
 |---|---|
+| Pretraining on 2016.10a-layout frames (11 classes, 128 samples, SNR -10..18 dB) | val top-1 80.9 % · -10 dB 25% · -4 dB 74% · 0 dB 90% · 4 dB 92% · 10 dB 92% · 18 dB 93% |
+| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 not run · not run |
+| Same, trained from scratch (no pretraining) | val top-1 not run |
+| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | not run / not run / not run |
+| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | not run / not run / not run |
+| ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | not run |
+| Few-shot novel modulations | not run |
+| Specific emitter identification | not run |
+
+**Synthetic RadioML-layout data** (`data/synth_mod.py`: same classes and file layouts, so these are pipeline numbers, NOT RadioML results)
+
+| Experiment | Result |
+|---|---|
+| Pretraining on 2016.10a-layout frames (24 classes, 128 samples, SNR -10..30 dB) | val top-1 47.6 % · -10 dB 16% · -4 dB 24% · 0 dB 37% · 4 dB 50% · 10 dB 49% · 18 dB 57% |
 | Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 71.6 % · -10 dB 31% · -4 dB 51% · 0 dB 59% · 4 dB 69% · 10 dB 83% · 20 dB 85% · 30 dB 87% |
 | Same, trained from scratch (no pretraining) | val top-1 70.5 % |
 | Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 65.3 % / 60.5 % / 59.7 % · pretrain gain +5.6 pp · BYOL gain +0.8 pp |
@@ -27,12 +41,21 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 | ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | 50.5 % vs 71.6 % |
 | Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 78.3 % ± 3.8 (chance 33 %); embeddings from scratch model 80.2 %, random init 34.3 % |
 | Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 56.1 % · unseen devices 79.2 % ± 2.2 (chance 25 %) |
+
+**Platform, retrieval, agent** (measured on the live stack)
+
+| Experiment | Result |
+|---|---|
 | REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 86.5 % ± 0.3 / 86.9 % ± 0.5 / 71.1 % ± 0.7 · transfer gain -0.4 pp (chance 9 %) |
 | REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 71.7 % ± 1.1 / 75.8 % ± 0.8 / 66.1 % ± 0.9 · transfer gain -4.1 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 85.6 % ± 0.5 / 86.6 % ± 0.4 / 75.0 % ± 0.3 · transfer gain -1.1 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 76.7 % ± 0.2 / 75.5 % ± 1.0 / 69.8 % ± 0.5 · transfer gain +1.2 pp (chance 9 %) |
 | PDW deinterleaving (synthetic, 4 emitters, DBSCAN) | purity 1.00 / completeness 1.00 (tests/test_core.py) |
 | /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU | end-to-end p50 92.6 ms · p95 311.33 ms · p99 501.82 ms · 255.0 req/s · model-only p50 1.05 ms |
 | RAG retrieval, 53 questions, 37 chunks (BAAI/bge-small-en-v1.5) | hybrid hit@5 100.0 % · MRR 0.93 · dense-only hit@5 98.1 % |
 | Agent task success (10 tasks, qwen2.5:7b) | 10/10 = 100.0 % |
+
+Every number is written by a script into a results JSON with provenance (dataset path, synthetic flag, GPU, seed, git commit) and rendered from there; nothing in these tables is typed by hand.
 <!-- results:end -->
 
 The full run log with per-SNR curves, few-shot episodes, retrieval misses and per-task agent traces is in

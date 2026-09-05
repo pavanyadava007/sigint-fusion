@@ -22,3 +22,6 @@ gateway-java/target/
 *.log
 .ipynb_checkpoints/
 ml-service/data/hf_rml2016/
+ml-service/data/classes.txt
+ml-service/data/LICENSE.TXT
+ml-service/results/*.log

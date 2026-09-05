@@ -13,10 +13,21 @@ import pickle
 import h5py
 import numpy as np
 
+# Label order of the DeepSig 2018.01A one-hot vectors = the order in the RadioML 2018 paper (O'Shea et al. 2018). The classes.txt
+# shipped inside the tarball lists the classes in a DIFFERENT order and is NOT the label order: scripts/check_2018_labels.py verifies
+# this from signal physics (OOK has the largest envelope variation, OOK/ASK/BPSK show a squared-signal spectral line, FM/GMSK are
+# constant-envelope), and every signature matches this order, none match classes.txt. Synthetic files carry their own `classes` attr.
 MODS_2018 = [
     "OOK", "4ASK", "8ASK", "BPSK", "QPSK", "8PSK", "16PSK", "32PSK", "16APSK", "32APSK", "64APSK", "128APSK",
     "16QAM", "32QAM", "64QAM", "128QAM", "256QAM", "AM-SSB-WC", "AM-SSB-SC", "AM-DSB-WC", "AM-DSB-SC", "FM", "GMSK", "OQPSK",
 ]  # fmt: skip
+
+
+def class_names_2018(path: str, f: h5py.File | None = None) -> list[str]:
+    """Label order used by a 2018-layout file: the HDF5 `classes` attribute when present (synthetic files), else MODS_2018."""
+    if f is not None and "classes" in f.attrs:
+        return [str(c) for c in f.attrs["classes"]]
+    return list(MODS_2018)
 
 
 def normalise(x: np.ndarray) -> np.ndarray:
@@ -41,9 +52,10 @@ def load_2016(path: str, snr_min: int = -20):
 def load_2018(path: str, classes: list[str] | None = None, snr_min: int = -20, max_per_class: int | None = None,
               seed: int = 0, chunk: int = 65536):
     """classes: modulation names to keep (held-out few-shot splits). Reads the file chunk-wise (memory-safe on the 21 GB original)."""
-    keep_idx = None if classes is None else np.array([MODS_2018.index(c) for c in classes])
     rng = np.random.default_rng(seed)
     with h5py.File(path, "r") as f:
+        names = class_names_2018(path, f)
+        keep_idx = None if classes is None else np.array([names.index(c) for c in classes])
         Y = f["Y"][:].argmax(1)
         Z = f["Z"][:, 0].astype(np.int64)
         keep = Z >= snr_min
@@ -65,4 +77,4 @@ def load_2018(path: str, classes: list[str] | None = None, snr_min: int = -20, m
     if keep_idx is not None:
         remap = {c: i for i, c in enumerate(keep_idx)}
         y = np.array([remap[v] for v in y])
-    return normalise(X.transpose(0, 2, 1)), y, Z, (classes or MODS_2018)
+    return normalise(X.transpose(0, 2, 1)), y, Z, (classes or names)
