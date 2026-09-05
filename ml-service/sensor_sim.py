@@ -1,8 +1,9 @@
 """Simulated edge sensors streaming into the ingest gateway.
 
 A fixed scenario of emitters (each with RF, bearing, modulation and, for radars, PRI/PW behaviour) is observed by several
-COMINT sensors (I/Q captures, generated with the synthetic modulator) and one R-ESM sensor (pulse descriptor words).
-Bearings drift slowly so the fusion tracker has something to track. No dataset file is needed.
+COMINT sensors (I/Q captures) and one R-ESM sensor (pulse descriptor words). Bearings drift slowly so the fusion tracker
+has something to track. I/Q frames come from data/sim_frames.npz (REAL RadioML 2018.01A frames extracted by
+scripts/make_sim_frames.py) when that file exists, otherwise from the synthetic modulator.
 
 python sensor_sim.py --gateway http://localhost:8080 --rate 5 --sensors 3
 """
@@ -11,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 import time
 
 import httpx
@@ -19,6 +21,25 @@ import numpy as np
 from data.synth_mod import make_sample
 
 log = logging.getLogger("sensor-sim")
+
+
+class FrameSource:
+    """Yields I/Q frames [L,2] for a modulation: real RadioML frames from an npz bank if available, else synthetic."""
+
+    def __init__(self, path: str, rng: np.random.Generator):
+        self.rng, self.bank = rng, None
+        if path and os.path.exists(path):
+            z = np.load(path, allow_pickle=False)
+            classes = [str(c) for c in z["classes"]]
+            self.bank = {c: z["X"][z["y"] == i].astype(np.float32) for i, c in enumerate(classes)}
+            log.info("using %d real frames from %s (%s)", len(z["y"]), path, str(z["source"]))
+        else:
+            log.info("no frame bank at %s, streaming synthetic frames", path)
+
+    def __call__(self, mod: str, length: int, snr: float) -> np.ndarray:
+        if self.bank and mod in self.bank:
+            return self.bank[mod][self.rng.integers(len(self.bank[mod]))].T  # [2,L] -> [L,2]
+        return make_sample(mod, length, snr, int(self.rng.integers(0, 2**31 - 1)))
 
 # rf MHz, bearing deg, modulation, snr dB, radar (pw us, pri ms, pri type) or None
 SCENARIO = [
@@ -56,10 +77,12 @@ def main():
     p.add_argument("--length", type=int, default=1024)
     p.add_argument("--duration", type=float, default=0, help="seconds to run (0 = forever)")
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--frames", default=os.getenv("SIM_FRAMES", "data/sim_frames.npz"), help="npz bank of real frames (optional)")
     a = p.parse_args()
     logging.basicConfig(level="INFO", format="%(asctime)s %(levelname)s %(name)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)
     rng = np.random.default_rng(a.seed)
+    frames = FrameSource(a.frames, rng)
     client = httpx.Client(timeout=10, trust_env=False)
     t_start, tick, sent, failed = time.time(), 0, 0, 0
     comint = [e for e in SCENARIO if e["mod"] != "pulse"]
@@ -67,7 +90,7 @@ def main():
         drift = np.sin(tick / 60.0)  # slow bearing wander
         for s in range(a.sensors):
             e = comint[(tick + s) % len(comint)]
-            x = make_sample(e["mod"], a.length, e["snr"] + rng.normal(0, 2), int(rng.integers(0, 2**31 - 1)))
+            x = frames(e["mod"], a.length, e["snr"] + rng.normal(0, 2))
             body = dict(sensorId=f"sirius-{s}", rfMhz=e["rf"], aoa=float((e["aoa"] + 3 * drift + rng.normal(0, 1.0)) % 360),
                         i=x[:, 0].tolist(), q=x[:, 1].tolist())
             try:

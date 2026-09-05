@@ -3,6 +3,8 @@
 # Checks every backend via its proxied path, pushes one I/Q chunk and one PDW batch through the gateway, and waits for
 # the consumer to turn them into detections and a fused track.
 set -euo pipefail
+ENV_FILE="$(dirname "$0")/../.env"
+[ -f "$ENV_FILE" ] && WEB_PORT=${WEB_PORT:-$(grep -E '^WEB_PORT=' "$ENV_FILE" | cut -d= -f2)}
 BASE=${BASE:-http://localhost:${WEB_PORT:-3000}}
 say() { printf '%-46s %s\n' "$1" "$2"; }
 ok() { say "$1" "ok $2"; }

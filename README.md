@@ -16,18 +16,18 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 ## Results
 
 <!-- results:start -->
-**Real DeepSig RadioML** (`data/RML2016.10a_dict.pkl`; rows saying not run are still in progress)
+**Real DeepSig RadioML** (`data/GOLD_XYZ_OSC.0001_1024.hdf5`; rows saying not run are still in progress)
 
 | Experiment | Result |
 |---|---|
-| Pretraining on 2016.10a-layout frames (11 classes, 128 samples, SNR -10..18 dB) | val top-1 80.9 % · -10 dB 25% · -4 dB 74% · 0 dB 90% · 4 dB 92% · 10 dB 92% · 18 dB 93% |
-| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 not run · not run |
-| Same, trained from scratch (no pretraining) | val top-1 not run |
-| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | not run / not run / not run |
-| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | not run / not run / not run |
+| Pretraining on 2016.10a-layout frames (11 classes, 128 samples, SNR -10..18 dB) | val top-1 80.7 % · -10 dB 23% · -4 dB 74% · 0 dB 90% · 4 dB 92% · 10 dB 92% · 18 dB 92% |
+| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 75.7 % · -10 dB 17% · -4 dB 40% · 0 dB 59% · 4 dB 79% · 10 dB 94% · 20 dB 95% · 30 dB 96% |
+| Same, trained from scratch (no pretraining) | val top-1 74.9 % |
+| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 69.3 % / 63.2 % / 65.8 % · pretrain gain +3.5 pp · BYOL gain -2.7 pp |
+| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 51.4 % / 48.0 % / 46.9 % · pretrain gain +4.5 pp · BYOL gain +1.1 pp |
 | ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | not run |
-| Few-shot novel modulations | not run |
-| Specific emitter identification | not run |
+| Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 87.6 % ± 4.3 (chance 33 %); embeddings from scratch model 86.7 %, random init 33.8 % |
+| Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 98.9 % · unseen devices 100.0 % ± 0.1 (chance 25 %) |
 
 **Synthetic RadioML-layout data** (`data/synth_mod.py`: same classes and file layouts, so these are pipeline numbers, NOT RadioML results)
 
@@ -51,7 +51,7 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 | REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 85.6 % ± 0.5 / 86.6 % ± 0.4 / 75.0 % ± 0.3 · transfer gain -1.1 pp (chance 9 %) |
 | REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 76.7 % ± 0.2 / 75.5 % ± 1.0 / 69.8 % ± 0.5 · transfer gain +1.2 pp (chance 9 %) |
 | PDW deinterleaving (synthetic, 4 emitters, DBSCAN) | purity 1.00 / completeness 1.00 (tests/test_core.py) |
-| /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU | end-to-end p50 92.6 ms · p95 311.33 ms · p99 501.82 ms · 255.0 req/s · model-only p50 1.05 ms |
+| /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU, real-data model | end-to-end p50 110.36 ms · p95 232.12 ms · p99 311.77 ms · 251.3 req/s · model-only p50 1.48 ms |
 | RAG retrieval, 53 questions, 37 chunks (BAAI/bge-small-en-v1.5) | hybrid hit@5 100.0 % · MRR 0.93 · dense-only hit@5 98.1 % |
 | Agent task success (10 tasks, qwen2.5:7b) | 10/10 = 100.0 % |
 
@@ -64,7 +64,7 @@ flag, GPU, seed, git commit) and rendered from there; nothing in the tables is t
 
 ## Operator console
 
-Live stack, synthetic sensor scenario (7 emitters, 3 COMINT sensors, 1 R-ESM sensor), qwen2.5:7b on the local GPU.
+Live stack: 7-emitter scenario observed by 3 COMINT sensors streaming real RadioML 2018.01A frames and 1 R-ESM sensor, classified by the real-data model, qwen2.5:7b on the local GPU.
 
 | Overview: waterfall, live detections, EOB bearing rose | Emitters: fused tracks with a comint+resm track selected |
 |---|---|
@@ -130,7 +130,8 @@ container, a tiny CPU training smoke of all three train modes, the Java build wi
   handled by prototypical nearest-centroid on embeddings, so a new modulation or emitter needs five samples and no retraining.
 - **Self-supervision.** BYOL on unlabelled I/Q with RF-plausible augmentations (phase rotation, CFO, SNR jitter, time shift).
 - **SEI.** Hardware impairments (I/Q imbalance, CFO, phase noise, PA nonlinearity) as the fingerprint; the same pipeline
-  reads ORACLE captures when present.
+  reads ORACLE captures when present. The fingerprints in the results table are synthetic impairments imprinted on real
+  QPSK frames, which makes the task easy (near 100 %); only ORACLE captures would give a real SEI number.
 - **Fusion.** One track per emitter across R-ESM and COMINT sensors; multi-sensor sightings in one batch are associated per
   sensor so they merge instead of spawning duplicates.
 - **RAG decouples knowledge from weights.** Updating the catalogue is a re-ingest that takes seconds. Retrieval is hybrid

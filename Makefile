@@ -11,7 +11,7 @@ help:            ## list targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*##' '{printf "  %-12s %s\n", $$1, $$2}'
 
 venv:            ## create .venv (python 3.11) with CUDA torch + all dev deps
-	uv venv --python 3.11 .venv && . .venv/bin/activate && uv pip install --index-url https://download.pytorch.org/whl/cu128 torch \
+	uv venv --python 3.11 .venv && . .venv/bin/activate && uv pip install --index-url https://download.pytorch.org/whl/cu128 torch torchvision \
 	&& uv pip install -r ml-service/requirements-train.txt -r agent/requirements.txt && uv pip install "numpy<2"
 
 data:            ## generate the synthetic RadioML-layout datasets

@@ -1,0 +1,106 @@
+{
+ "mode": "byol",
+ "name": "byol_real",
+ "n_unlabeled": 72000,
+ "epochs": 20,
+ "history": [
+  {
+   "epoch": 0,
+   "loss": 0.4083
+  },
+  {
+   "epoch": 1,
+   "loss": 0.098
+  },
+  {
+   "epoch": 2,
+   "loss": 0.0798
+  },
+  {
+   "epoch": 3,
+   "loss": 0.0743
+  },
+  {
+   "epoch": 4,
+   "loss": 0.07
+  },
+  {
+   "epoch": 5,
+   "loss": 0.0678
+  },
+  {
+   "epoch": 6,
+   "loss": 0.068
+  },
+  {
+   "epoch": 7,
+   "loss": 0.0678
+  },
+  {
+   "epoch": 8,
+   "loss": 0.068
+  },
+  {
+   "epoch": 9,
+   "loss": 0.0692
+  },
+  {
+   "epoch": 10,
+   "loss": 0.0689
+  },
+  {
+   "epoch": 11,
+   "loss": 0.0676
+  },
+  {
+   "epoch": 12,
+   "loss": 0.0686
+  },
+  {
+   "epoch": 13,
+   "loss": 0.0677
+  },
+  {
+   "epoch": 14,
+   "loss": 0.0675
+  },
+  {
+   "epoch": 15,
+   "loss": 0.0679
+  },
+  {
+   "epoch": 16,
+   "loss": 0.0704
+  },
+  {
+   "epoch": 17,
+   "loss": 0.072
+  },
+  {
+   "epoch": 18,
+   "loss": 0.0717
+  },
+  {
+   "epoch": 19,
+   "loss": 0.0719
+  }
+ ],
+ "out": "ckpt/real/byol.pt",
+ "seconds": 683.6,
+ "data": "data/GOLD_XYZ_OSC.0001_1024.hdf5",
+ "synthetic": false,
+ "device": "NVIDIA L4",
+ "seed": 0,
+ "git": "cd144af",
+ "timestamp": "2026-09-05T21:11:55+00:00",
+ "args": {
+  "data": "data/GOLD_XYZ_OSC.0001_1024.hdf5",
+  "epochs": 20,
+  "bs": 256,
+  "out": "ckpt/real/byol.pt",
+  "tau": 0.99,
+  "max_per_class": 3000,
+  "seed": 0,
+  "name": "byol_real"
+ }
+}

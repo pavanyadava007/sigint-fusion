@@ -3,24 +3,24 @@
  "conc": 32,
  "length": 1024,
  "errors": 0,
- "req_per_s": 255.0,
+ "req_per_s": 251.3,
  "end_to_end_ms": {
-  "p50": 92.6,
-  "p95": 311.33,
-  "p99": 501.82
+  "p50": 110.36,
+  "p95": 232.12,
+  "p99": 311.77
  },
  "model_only_ms": {
-  "p50": 1.05,
-  "p95": 4.26,
-  "p99": 7.933
+  "p50": 1.48,
+  "p95": 11.714,
+  "p99": 30.774
  },
  "providers": [
   "CPUExecutionProvider"
  ],
  "model": "ckpt/ft.onnx",
- "label": "docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU",
+ "label": "docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU, real-data model",
  "client_host": "ip-10-194-160-170.eu-central-1.compute.internal",
  "cpu": "x86_64",
  "url": "http://localhost:8000",
- "timestamp": "2026-09-05T02:25:51+00:00"
+ "timestamp": "2026-09-05T21:21:55+00:00"
 }

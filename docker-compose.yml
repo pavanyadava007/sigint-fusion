@@ -126,6 +126,7 @@ services:
   sensor-sim:
     build: ./ml-service
     command: ["python", "sensor_sim.py", "--gateway", "http://gateway:8080", "--rate", "${SIM_RATE:-4}", "--sensors", "3"]
+    volumes: ["./ml-service/data:/app/data:ro"]   # exposes data/sim_frames.npz (real frames) when present
     depends_on:
       gateway: { condition: service_started }
     profiles: [sim]
