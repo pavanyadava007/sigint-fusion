@@ -1,0 +1,9 @@
+data/*.hdf5
+data/*.pkl
+ckpt/*.pt
+results
+mlruns
+__pycache__
+**/__pycache__
+.pytest_cache
+tests

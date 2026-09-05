@@ -1,0 +1,53 @@
+{"q": "which band does a marine navigation radar use", "expect": "9300"}
+{"q": "frequency of aircraft transponder replies", "expect": "1090"}
+{"q": "VHF distress channel frequency", "expect": "156.8"}
+{"q": "what modulation is airband voice", "expect": "AM"}
+{"q": "typical DF accuracy", "expect": "1 degree"}
+{"q": "what is the international aeronautical emergency frequency", "expect": "121.5"}
+{"q": "military UHF guard frequency", "expect": "243"}
+{"q": "SSR interrogation frequency", "expect": "1030"}
+{"q": "GPS L1 centre frequency", "expect": "1575.42"}
+{"q": "airport surveillance radar band", "expect": "2700"}
+{"q": "weather radar frequency", "expect": "5600"}
+{"q": "AIS modulation type", "expect": "GMSK"}
+{"q": "which channel carries DSC digital selective calling", "expect": "156.525"}
+{"q": "EPIRB beacon frequency", "expect": "406"}
+{"q": "TETRA modulation", "expect": "DQPSK"}
+{"q": "PMR446 band", "expect": "446"}
+{"q": "FM broadcast deviation", "expect": "75 kHz"}
+{"q": "what does PDW stand for", "expect": "pulse descriptor word"}
+{"q": "what is deinterleaving", "expect": "per-emitter"}
+{"q": "what is an electronic order of battle", "expect": "fused list of emitters"}
+{"q": "how does the tracker associate detections", "expect": "Hungarian"}
+{"q": "what is specific emitter identification", "expect": "hardware impairments"}
+{"q": "when is an identification marked tentative", "expect": "0.6"}
+{"q": "what is CFAR", "expect": "constant false alarm rate"}
+{"q": "report sections required in an analyst report", "expect": "Recommended actions"}
+{"q": "how to identify an unknown emitter step by step", "expect": "catalogue"}
+{"q": "staggered PRI meaning", "expect": "discrete PRIs"}
+{"q": "why do radars jitter their PRI", "expect": "range-gate"}
+{"q": "ESM coverage band of a radar warning receiver", "expect": "2-18 GHz"}
+{"q": "X band frequency range", "expect": "8-12 GHz"}
+{"q": "S band radar uses", "expect": "airport surveillance"}
+{"q": "ILS localiser frequencies", "expect": "108-112"}
+{"q": "DME TACAN band", "expect": "960-1215"}
+{"q": "NAVTEX frequency", "expect": "518"}
+{"q": "Wi-Fi drone control band", "expect": "2400"}
+{"q": "5.8 GHz ISM use", "expect": "5725"}
+{"q": "DVB-T television band", "expect": "470"}
+{"q": "cellular LTE 5G bands", "expect": "3.4-3.8"}
+{"q": "marine radar antenna rotation speed", "expect": "20-45 rpm"}
+{"q": "typical ASR pulse width and PRF", "expect": "700-1200"}
+{"q": "Mode S reply modulation", "expect": "pulse position"}
+{"q": "amateur radio 2 metre band", "expect": "144"}
+{"q": "S-band marine radar advantages", "expect": "rain"}
+{"q": "is a 1090 MHz OOK detection a jammer", "expect": "not a jammer"}
+{"q": "what does 2.4 GHz QPSK near an airfield usually mean", "expect": "drone"}
+{"q": "high confidence definition for a report", "expect": "two or more sensors"}
+{"q": "label agreement threshold for tentative", "expect": "0.7"}
+{"q": "edge sensors and threat library placement", "expect": "fusion backend"}
+{"q": "COMINT versus ELINT", "expect": "radars"}
+{"q": "Galileo E1 frequency", "expect": "1575.42"}
+{"q": "what is transmitting around 9400 MHz", "expect": "9300-9500"}
+{"q": "unknown pulsed emitter at 2.8 GHz with 1 us pulses", "expect": "airport surveillance"}
+{"q": "FM voice heard on 156.65 MHz, which channel", "expect": "156-162"}

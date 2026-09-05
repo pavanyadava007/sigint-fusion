@@ -1,0 +1,14 @@
+# Runtime for app.py / consumer.py / sensor_sim.py (CPU). Training extras: see requirements-train.txt
+numpy<2
+scipy>=1.11
+scikit-learn>=1.3
+h5py>=3.10
+fastapi>=0.110
+uvicorn[standard]>=0.27
+pydantic>=2.5
+onnxruntime>=1.17
+aiokafka>=0.10
+cramjam>=2.8       # aiokafka codec backend (gateway producer uses lz4 compression)
+asyncpg>=0.29
+httpx>=0.27
+prometheus-client>=0.19

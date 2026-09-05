@@ -1,0 +1,145 @@
+# SIGINT-Fusion platform. `cp .env.example .env && docker compose up -d --build`
+# GPU for the local LLM: add `-f docker-compose.gpu.yml`. Ollama models: scripts/ollama_sideload.sh (proxy-safe) or `docker compose exec ollama ollama pull qwen2.5:7b`.
+name: sigint-fusion
+
+x-pg-env: &pg-env
+  PG: postgresql://sigint:${POSTGRES_PASSWORD:-sigint}@postgres:5432/sigint
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: sigint
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sigint}
+      POSTGRES_DB: sigint
+    volumes:
+      - ./rag/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    ports: ["127.0.0.1:5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sigint -d sigint"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  kafka:
+    image: apache/kafka:3.8.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports: ["127.0.0.1:29092:29092"]
+    volumes: [kafkadata:/tmp/kraft-combined-logs]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 15
+      start_period: 20s
+    restart: unless-stopped
+
+  gateway:
+    build: ./gateway-java
+    environment:
+      KAFKA: kafka:9092
+    ports: ["127.0.0.1:8080:8080"]
+    depends_on:
+      kafka: { condition: service_healthy }
+    restart: unless-stopped
+
+  ml-service:
+    build: ./ml-service
+    environment:
+      <<: *pg-env
+      MODEL: ${MODEL:-ckpt/ft.onnx}
+      CORS_ORIGINS: ""
+    volumes: ["./ml-service/ckpt:/app/ckpt:ro"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: unless-stopped
+
+  ml-consumer:
+    build: ./ml-service
+    command: ["python", "consumer.py"]
+    environment:
+      <<: *pg-env
+      KAFKA: kafka:9092
+      MODEL: ${MODEL:-ckpt/ft.onnx}
+    volumes: ["./ml-service/ckpt:/app/ckpt:ro"]
+    depends_on:
+      kafka: { condition: service_healthy }
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,sys,time; sys.exit(0 if time.time()-os.path.getmtime('/tmp/consumer.heartbeat') < 60 else 1)"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  agent:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    environment:
+      <<: *pg-env
+      ML_URL: http://ml-service:8000
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:7b}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-ollama}
+      CORS_ORIGINS: ""
+    ports: ["127.0.0.1:8001:8001"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      ml-service: { condition: service_healthy }
+    restart: unless-stopped
+
+  rag-ingest:
+    build:
+      context: .
+      dockerfile: agent/Dockerfile
+    command: ["python", "rag/ingest.py", "--corpus", "rag/corpus"]
+    environment: *pg-env
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+
+  ollama:
+    image: ollama/ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: -1
+    volumes: [ollama:/root/.ollama]
+    ports: ["127.0.0.1:11434:11434"]
+    restart: unless-stopped
+
+  sensor-sim:
+    build: ./ml-service
+    command: ["python", "sensor_sim.py", "--gateway", "http://gateway:8080", "--rate", "${SIM_RATE:-4}", "--sensors", "3"]
+    depends_on:
+      gateway: { condition: service_started }
+    profiles: [sim]
+    healthcheck: { disable: true }
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    ports: ["${WEB_PORT:-3000}:80"]
+    depends_on: [ml-service, agent, gateway]
+    restart: unless-stopped
+
+volumes:
+  pgdata: {}
+  kafkadata: {}
+  ollama:
+    name: sigint_ollama

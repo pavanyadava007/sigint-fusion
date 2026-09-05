@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 160
+target-version = "py311"
+extend-exclude = ["web", "gateway-java", "data/*.hdf5"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B905", "B008", "E731"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning", "ignore::UserWarning"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["data", "models", "sigproc", "fusion", "tools", "agent", "embeddings", "retrieval"]

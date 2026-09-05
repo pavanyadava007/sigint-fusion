@@ -1,0 +1,12 @@
+{
+ "n": 53,
+ "k": 5,
+ "docs": 37,
+ "embed_model": "BAAI/bge-small-en-v1.5",
+ "dense_hit_at_5": 0.981,
+ "hybrid_hit_at_5": 1.0,
+ "dense_mrr": 0.891,
+ "hybrid_mrr": 0.931,
+ "misses": [],
+ "timestamp": "2026-09-04T22:59:02+00:00"
+}

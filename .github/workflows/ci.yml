@@ -1,0 +1,50 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env: { POSTGRES_USER: sigint, POSTGRES_PASSWORD: sigint, POSTGRES_DB: sigint }
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U sigint" --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu -r ml-service/requirements-train.txt -r agent/requirements.txt && pip install "numpy<2"
+      - run: ruff check ml-service rag agent scripts
+      - run: cd ml-service && python -m pytest -q tests fusion
+      - run: cd rag && python -m pytest -q tests
+      - name: rag ingest + retrieval eval against the service container
+        run: cd rag && python ingest.py && python eval.py questions.jsonl
+        env: { PG: postgresql://sigint:sigint@localhost:5432/sigint }
+      - name: tiny end-to-end training smoke (CPU)
+        run: |
+          cd ml-service
+          python -m data.synth_mod --out data/smoke.hdf5 --length 256 --per-class 40 --workers 2
+          python -m data.synth_mod --out data/smoke16.pkl --length 128 --per-class 20 --format 2016 --workers 2
+          python train.py pretrain --data data/smoke16.pkl --epochs 1 --out ckpt/smoke_pre.pt --name smoke_pre --workers 0
+          python train.py finetune --data data/smoke.hdf5 --init ckpt/smoke_pre.pt --epochs 1 --max_per_class 40 --out ckpt/smoke_ft.pt --name smoke_ft --workers 0
+          python train.py fewshot --data data/smoke.hdf5 --init ckpt/smoke_ft.pt --episodes 2 --name smoke_fs
+  java:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: "21", cache: maven }
+      - run: cd gateway-java && mvn -q -B package
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "22", cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: cd web && npm ci && npm run typecheck && npm run build
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config -q
+      - run: docker build -q ml-service

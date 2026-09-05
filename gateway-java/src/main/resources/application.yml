@@ -1,0 +1,43 @@
+server:
+  port: ${PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: gateway
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+  threads:
+    virtual:
+      enabled: true
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: true
+  kafka:
+    bootstrap-servers: ${KAFKA:localhost:9092}
+    admin:
+      fail-fast: false
+      operation-timeout: 10s
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: 1
+      properties:
+        linger.ms: 5
+        batch.size: 65536
+        compression.type: lz4
+        max.block.ms: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,kafka

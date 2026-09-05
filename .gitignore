@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+mlruns/
+# data and weights are reproducible from scripts; served ONNX is kept (small)
+ml-service/data/*.hdf5
+ml-service/data/*.pkl
+ml-service/data/oracle/
+ml-service/ckpt/*
+!ml-service/ckpt/ft.onnx
+!ml-service/ckpt/ft.onnx.classes.json
+# node
+web/node_modules/
+web/dist/
+# java
+gateway-java/target/
+# local env
+.env
+*.log
+.ipynb_checkpoints/

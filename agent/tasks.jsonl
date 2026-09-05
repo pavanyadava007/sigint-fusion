@@ -1,0 +1,10 @@
+{"q": "What is transmitting around 9400 MHz? Identify it.", "must_call": ["query_emitter_db"], "must_contain": ["navigation"]}
+{"q": "Summarise the last 10 minutes of detections and write a report.", "must_call": ["recent_detections", "save_report"], "must_contain_any": ["summary", "saved"]}
+{"q": "Which VHF channel is used for maritime distress? Give the channel number and its frequency in MHz.", "must_call": ["search_docs"], "must_contain": ["16"], "must_contain_any": ["156.8", "156.800"]}
+{"q": "What is the current electronic order of battle? List the fused tracks.", "must_call": ["current_tracks"], "must_contain": ["track"]}
+{"q": "An emitter at 1090 MHz shows OOK pulses. Is it a jammer?", "must_call": ["query_emitter_db"], "must_contain_any": ["transponder", "SSR", "ADS-B", "secondary surveillance"], "must_not_contain": ["is a jammer"]}
+{"q": "What is the international aeronautical emergency frequency and what modulation does airband voice use?", "must_call_any": ["search_docs", "query_emitter_db"], "must_contain": ["121.5", "AM"]}
+{"q": "We see a 2800 MHz pulsed emitter with 1 microsecond pulses and a staggered PRI. What is it most likely?", "must_call": ["query_emitter_db"], "must_contain": ["surveillance"]}
+{"q": "According to the knowledge base, what does a pulse descriptor word contain?", "must_call": ["search_docs"], "must_contain": ["time of arrival"]}
+{"q": "Deinterleave these pulses: [[0,9410,0.5,118],[0.5,9410,0.5,118],[1.0,9410,0.5,118],[1.5,9410,0.5,118],[2.0,9410,0.5,118],[2.5,9410,0.5,118],[0.2,2800,1.0,270],[1.2,2800,1.0,270],[2.2,2800,1.0,270],[3.2,2800,1.0,270],[4.2,2800,1.0,270],[5.2,2800,1.0,270]]. How many emitters and what PRI types?", "must_call": ["deinterleave"], "must_contain": ["2"]}
+{"q": "List the reports saved so far.", "must_call": ["list_reports"], "must_contain": ["report"]}

@@ -1,0 +1,106 @@
+{
+ "mode": "byol",
+ "name": "byol",
+ "n_unlabeled": 59110,
+ "epochs": 20,
+ "history": [
+  {
+   "epoch": 0,
+   "loss": 0.3808
+  },
+  {
+   "epoch": 1,
+   "loss": 0.1055
+  },
+  {
+   "epoch": 2,
+   "loss": 0.0765
+  },
+  {
+   "epoch": 3,
+   "loss": 0.067
+  },
+  {
+   "epoch": 4,
+   "loss": 0.0709
+  },
+  {
+   "epoch": 5,
+   "loss": 0.0791
+  },
+  {
+   "epoch": 6,
+   "loss": 0.0881
+  },
+  {
+   "epoch": 7,
+   "loss": 0.0963
+  },
+  {
+   "epoch": 8,
+   "loss": 0.1021
+  },
+  {
+   "epoch": 9,
+   "loss": 0.1082
+  },
+  {
+   "epoch": 10,
+   "loss": 0.1136
+  },
+  {
+   "epoch": 11,
+   "loss": 0.1161
+  },
+  {
+   "epoch": 12,
+   "loss": 0.1226
+  },
+  {
+   "epoch": 13,
+   "loss": 0.1285
+  },
+  {
+   "epoch": 14,
+   "loss": 0.1333
+  },
+  {
+   "epoch": 15,
+   "loss": 0.1426
+  },
+  {
+   "epoch": 16,
+   "loss": 0.1455
+  },
+  {
+   "epoch": 17,
+   "loss": 0.1481
+  },
+  {
+   "epoch": 18,
+   "loss": 0.1522
+  },
+  {
+   "epoch": 19,
+   "loss": 0.1537
+  }
+ ],
+ "out": "ckpt/byol.pt",
+ "seconds": 735.5,
+ "data": "data/synth_2018.hdf5",
+ "synthetic": true,
+ "device": "NVIDIA L4",
+ "seed": 0,
+ "git": null,
+ "timestamp": "2026-09-04T23:08:57+00:00",
+ "args": {
+  "data": "data/synth_2018.hdf5",
+  "epochs": 20,
+  "bs": 256,
+  "out": "ckpt/byol.pt",
+  "tau": 0.99,
+  "max_per_class": 3000,
+  "seed": 0,
+  "name": "byol"
+ }
+}

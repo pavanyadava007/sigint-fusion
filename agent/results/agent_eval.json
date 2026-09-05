@@ -1,0 +1,131 @@
+{
+ "n": 10,
+ "success": 10,
+ "success_rate": 1.0,
+ "model": "qwen2.5:7b",
+ "timestamp": "2026-09-05T02:36:55+00:00",
+ "tasks": [
+  {
+   "q": "What is transmitting around 9400 MHz? Identify it.",
+   "ok": true,
+   "called": [
+    "query_emitter_db"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 4.1,
+   "answer": "The transmission around 9400 MHz is identified as a **Generic X-band marine navigation radar**. This radar operates within the frequency range of 9300 MHz to 9500 MHz, with a pulse repetition interval (PRI) of 500 microseconds and a pulse width of 0.5 microseconds. It is a common civilian emitter, typically found near 9410 MHz, and uses a magnetron with short pulses and a high pulse repetition frequency (PRF) ranging from 20 to 45 rpm.\n\nThe identification is based on the query results from the emitter database, which indicate this as the most likely transmitter in the given frequency range. [S"
+  },
+  {
+   "q": "Summarise the last 10 minutes of detections and write a report.",
+   "ok": true,
+   "called": [
+    "recent_detections",
+    "current_tracks",
+    "save_report"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 65.5,
+   "answer": "### Report Key Findings\n\n- **Summary**: In the last 10 minutes, the system detected and tracked several signals across various frequencies and modulations. The most prominent signals were AM-DSB-WC, FM, QPSK, and OOK, which are likely from communication sources. The pulse signals are likely from radar or similar systems.\n- **Detailed Analysis**: \n  - **AM-DSB-WC (121.5 MHz)**: Detected by multiple sensors, indicating a strong and reliable signal.\n  - **FM (156.8 MHz)**: Detected by multiple sensors, suggesting it is a significant and possibly important signal.\n  - **QPSK (2400 MHz)**: Detected"
+  },
+  {
+   "q": "Which VHF channel is used for maritime distress? Give the channel number and its frequency in MHz.",
+   "ok": true,
+   "called": [
+    "search_docs"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 2.27,
+   "answer": "The VHF channel used for maritime distress is Channel 16, which operates at 156.800 MHz. This channel is used for international distress, safety, and calling communications."
+  },
+  {
+   "q": "What is the current electronic order of battle? List the fused tracks.",
+   "ok": true,
+   "called": [
+    "current_tracks"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 11.44,
+   "answer": "The current electronic order of battle includes the following tracks:\n\n| Track ID | RF Frequency (MHz) | Azimuth of Arrival (deg) | Sources | Sensors | Hits | Modulation | PRI Type | PRI (us) | Pulse Width (us) |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| 3 | 1089.99 | 198.7 | comint, resm | sirius-0, sirius-1, sirius-2, sirius-esm | 2537 | OOK | jitter | 1008.2 | 0.499 |\n| 2 | 156.8 | 40.4 | comint | sirius-0, sirius-1, sirius-2, smoke-1788575260 | 1807 | FM | - | - | - |\n| 4 | 2400.0 | 92.6 | comint | sirius-0, sirius-1, sirius-2 | 1807 | QPSK | - | - | - |\n| 1 | 121.5 |"
+  },
+  {
+   "q": "An emitter at 1090 MHz shows OOK pulses. Is it a jammer?",
+   "ok": true,
+   "called": [
+    "query_emitter_db"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 3.26,
+   "answer": "The emitter at 1090 MHz with OOK pulses is most likely an ADS-B extended squitter or a Mode S reply from a secondary radar system. These are not typically jamming signals; they are used for air traffic control and position reporting.\n\nHowever, if the OOK pulses are irregular or appear to be interfering with other communications, they could potentially be a form of jamming. To determine if this is the case, we would need to analyze the timing and pattern of the pulses more closely.\n\nWould you like to proceed with a more detailed analysis?"
+  },
+  {
+   "q": "What is the international aeronautical emergency frequency and what modulation does airband voice use?",
+   "ok": true,
+   "called": [
+    "search_docs"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 3.12,
+   "answer": "The international aeronautical emergency frequency is 121.5 MHz. Airband voice on the VHF \"airband\" (118-137 MHz) uses AM double-sideband with carrier (AM-DSB-WC) modulation, with channel spacing of 25 kHz or 8.33 kHz in Europe. The military UHF airband (225-400 MHz) also uses AM-DSB-WC modulation, with 243.0 MHz being the guard frequency."
+  },
+  {
+   "q": "We see a 2800 MHz pulsed emitter with 1 microsecond pulses and a staggered PRI. What is it most likely?",
+   "ok": true,
+   "called": [
+    "query_emitter_db"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 3.27,
+   "answer": "Based on the provided information, the most likely emitter is a **Generic S-band airport surveillance radar**. This radar operates in the 2700-2900 MHz range, has 1 microsecond pulses, and uses a staggered pulse repetition interval (PRI), which matches your observations.\n\n### Recommended Actions:\n- Verify the radar's operational status and scan characteristics.\n- Monitor for any changes in the radar's activity, such as increased pulse repetition frequency (PRF) or changes in the mechanical scan rate.\n\nIf you need a more detailed report, I can generate one for you."
+  },
+  {
+   "q": "According to the knowledge base, what does a pulse descriptor word contain?",
+   "ok": true,
+   "called": [
+    "search_docs"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 2.6,
+   "answer": "A pulse descriptor word (PDW) contains the following components:\n- Time of arrival (TOA)\n- Radio frequency (RF)\n- Pulse width (PW)\n- Angle of arrival (AOA)\n\nThese elements are used in the deinterleaving process to sort mixed pulses from multiple radars into individual emitter pulse trains. Additional parameters such as amplitude and sometimes intra-pulse modulation may also be included [source: [sigint_glossary.md]]."
+  },
+  {
+   "q": "Deinterleave these pulses: [[0,9410,0.5,118],[0.5,9410,0.5,118],[1.0,9410,0.5,118],[1.5,9410,0.5,118],[2.0,9410,0.5,118],[2.5,9410,0.5,118],[0.2,2800,1.0,270],[1.2,2800,1.0,270],[2.2,2800,1.0,270],[3.2,2800,1.0,270],[4.2,2800,1.0,270],[5.2,2800,1.0,270]]. How many emitters and what PRI types?",
+   "ok": true,
+   "called": [
+    "deinterleave"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 8.6,
+   "answer": "The deinterleaving process has identified two emitters:\n\n- **Emitter 0**: \n  - RF: 9410.0 MHz\n  - Pulse Width: 0.5 \u00b5s\n  - Azimuth of Arrival: 118.0 degrees\n  - PRI Mean: 0.5 seconds\n  - PRI Type: Constant\n\n- **Emitter 1**: \n  - RF: 2800.0 MHz\n  - Pulse Width: 1.0 \u00b5s\n  - Azimuth of Arrival: 270.0 degrees\n  - PRI Mean: 1.0 seconds\n  - PRI Type: Constant\n\nThere are two emitters, both with a constant PRI type."
+  },
+  {
+   "q": "List the reports saved so far.",
+   "ok": true,
+   "called": [
+    "list_reports"
+   ],
+   "missing_tools": [],
+   "missing_text": [],
+   "forbidden_found": [],
+   "seconds": 18.59,
+   "answer": "Here are the reports saved so far:\n\n1. **ID: 6**\n   - **Timestamp:** 2026-09-05T02:35:50+00:00\n   - **Question:** Generate a report on the recent detections and analysis.\n   - **Preview:** In the last 10 minutes, the system detected and tracked several signals across various frequencies and modulations. The most prominent signals were:\n     - **AM-DSB-WC (121.5 MHz):** Detected by `sirius-0`, `sirius-1`, and `sirius-2` with 1600 hits.\n     - **FM (156.8 MHz):** Detected by `sirius-0`, `sirius-1`, and `sirius-2`.\n\n2. **ID: 5**\n   - **Timestamp:** 2026-09-05T02:34:17+00:00\n   - **Question:** Sum"
+  }
+ ]
+}
