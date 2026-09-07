@@ -125,7 +125,8 @@ def main():
     real_done = any("not run" not in b for _, b in real_rows)
     if real_done:
         src = (ft_real or load("pretrain_real") or {}).get("data", "")
-        parts.append(f"**Real DeepSig RadioML** (`{src}`; rows saying not run are still in progress)\n\n{tbl(real_rows)}")
+        pending = any("not run" in b for _, b in real_rows)
+        parts.append(f"**Real DeepSig RadioML** (`{src}`{'; rows saying not run are still in progress' if pending else ''})\n\n{tbl(real_rows)}")
     else:
         parts.append("**Real DeepSig RadioML**: not run yet. Register at deepsig.ai, put the files in `ml-service/data/`, then "
                      "`DATA_2016=data/RML2016.10a_dict.pkl DATA_2018=data/GOLD_XYZ_OSC.0001_1024.hdf5 scripts/run_experiments.sh`.")

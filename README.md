@@ -16,7 +16,7 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 ## Results
 
 <!-- results:start -->
-**Real DeepSig RadioML** (`data/GOLD_XYZ_OSC.0001_1024.hdf5`; rows saying not run are still in progress)
+**Real DeepSig RadioML** (`data/GOLD_XYZ_OSC.0001_1024.hdf5`)
 
 | Experiment | Result |
 |---|---|
