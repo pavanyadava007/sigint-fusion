@@ -32,7 +32,7 @@ def acc(name: str, key="best_val_acc"):
 
 def snr_curve(d: dict, points=(-10, -4, 0, 4, 10, 20, 30)) -> str:
     c = d.get("acc_vs_snr", {})
-    return " · ".join(f"{s} dB {100 * c[str(s)]:.0f}%" for s in points if str(s) in c)
+    return "; ".join(f"{s} dB {100 * c[str(s)]:.0f}%" for s in points if str(s) in c)
 
 
 def classifier_rows(tag: str) -> tuple[list, dict | None]:
@@ -43,14 +43,14 @@ def classifier_rows(tag: str) -> tuple[list, dict | None]:
     rows = []
     if pre:
         rows.append((f"Pretraining on 2016.10a-layout frames ({len(pre['classes'])} classes, 128 samples, SNR -10..{max(map(int, pre['acc_vs_snr']))} dB)",
-                     f"val top-1 {pct(pre['best_val_acc'])} · " + snr_curve(pre, points=(-10, -4, 0, 4, 10, 18))))
+                     f"val top-1 {pct(pre['best_val_acc'])}; " + snr_curve(pre, points=(-10, -4, 0, 4, 10, 18))))
     rows.append(("Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune)",
-                 f"val top-1 {pct(acc(f'ft_pre_100{tag}'))} · " + (snr_curve(ft) if ft else "not run")))
+                 f"val top-1 {pct(acc(f'ft_pre_100{tag}'))}; " + (snr_curve(ft) if ft else "not run")))
     rows.append(("Same, trained from scratch (no pretraining)", f"val top-1 {pct(acc(f'ft_scratch_100{tag}'))}"))
     for f in ("0.1", "0.01"):
         p, s, b = acc(f"ft_pre_{f}{tag}"), acc(f"ft_scratch_{f}{tag}"), acc(f"ft_byol_{f}{tag}")
-        gain = f" · pretrain gain {100 * (p - s):+.1f} pp" if p is not None and s is not None else ""
-        bg = f" · BYOL gain {100 * (b - s):+.1f} pp" if b is not None and s is not None else ""
+        gain = f"; pretrain gain {100 * (p - s):+.1f} pp" if p is not None and s is not None else ""
+        bg = f"; BYOL gain {100 * (b - s):+.1f} pp" if b is not None and s is not None else ""
         rows.append((f"Data efficiency at {float(f) * 100:g} % of training data: pretrained / BYOL / scratch", f"{pct(p)} / {pct(b)} / {pct(s)}{gain}{bg}"))
     vit_txt = f"{pct(acc(f'ft_vit_100{tag}'))} vs {pct(acc(f'ft_pre_100{tag}'))}" if vit else "not run"
     rows.append(("ViT-tiny on STFT spectrogram vs ResNet-1D (same split)", vit_txt))
@@ -63,7 +63,7 @@ def classifier_rows(tag: str) -> tuple[list, dict | None]:
     if sei:
         fn = sei["fewshot_novel"]
         rows.append((f"Specific emitter identification ({sei['source']}, {sei['base_devices']} train devices, 4 unseen, {fn['shots']}-shot)",
-                     f"base val {pct(sei['base_val_acc'])} · unseen devices {pct(fn['acc_mean'])} ± {100 * fn['acc_std']:.1f} (chance 25 %)"))
+                     f"base val {pct(sei['base_val_acc'])}; unseen devices {pct(fn['acc_mean'])} ± {100 * fn['acc_std']:.1f} (chance 25 %)"))
     else:
         rows.append(("Specific emitter identification", "not run"))
     return rows, ft
@@ -83,21 +83,21 @@ def platform_rows() -> list:
             label = (f"REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, {real['classes']} classes, {pr['n_train']} train frames = "
                      f"{float(f) * 100:g} %), test acc over {real['seeds']} seeds: {what} / scratch / frozen linear probe")
             val = (f"{pct(pr['mean'])} ± {100 * pr['std']:.1f} / {pct(sc['mean'])} ± {100 * sc['std']:.1f} / {pct(lp['mean'])} ± {100 * lp['std']:.1f}"
-                   f" · transfer gain {100 * (pr['mean'] - sc['mean']):+.1f} pp (chance {pct(real['chance'], 0)})")
+                   f"; transfer gain {100 * (pr['mean'] - sc['mean']):+.1f} pp (chance {pct(real['chance'], 0)})")
             rows.append((label, val))
     rows.append(("PDW deinterleaving (synthetic, 4 emitters, DBSCAN)", "purity 1.00 / completeness 1.00 (tests/test_core.py)"))
     bench = load("benchmark_classify")
     if bench:
         e, m = bench["end_to_end_ms"], bench["model_only_ms"]
         rows.append((f"/classify latency, {bench['conc']} concurrent, n={bench['n']}, {bench.get('label') or 'CPU ONNX Runtime'}",
-                     f"end-to-end p50 {e['p50']} ms · p95 {e['p95']} ms · p99 {e['p99']} ms · {bench['req_per_s']} req/s · model-only p50 {m['p50']} ms"))
+                     f"end-to-end p50 {e['p50']} ms; p95 {e['p95']} ms; p99 {e['p99']} ms; {bench['req_per_s']} req/s; model-only p50 {m['p50']} ms"))
     else:
         rows.append(("/classify latency", "not run"))
     rag = load("rag_eval") or _load_json(os.path.join(ROOT, "rag", "results", "rag_eval.json"))
     if rag:
         k = rag["k"]
         rows.append((f"RAG retrieval, {rag['n']} questions, {rag['docs']} chunks ({rag['embed_model']})",
-                     f"hybrid hit@{k} {pct(rag[f'hybrid_hit_at_{k}'])} · MRR {rag['hybrid_mrr']:.2f} · dense-only hit@{k} {pct(rag[f'dense_hit_at_{k}'])}"))
+                     f"hybrid hit@{k} {pct(rag[f'hybrid_hit_at_{k}'])}; MRR {rag['hybrid_mrr']:.2f}; dense-only hit@{k} {pct(rag[f'dense_hit_at_{k}'])}"))
     else:
         rows.append(("RAG retrieval", "not run"))
     agent = _load_json(os.path.join(ROOT, "agent", "results", "agent_eval.json"))

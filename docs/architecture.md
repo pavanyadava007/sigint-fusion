@@ -2,16 +2,16 @@
 
 ```
                  HTTP (JSON)            Kafka (keyed by sensor)               Postgres / pgvector
- edge sensors ──────────────▶ gateway-java ──────────────▶ ml-consumer ───────────▶ detections, spectra, tracks
- (I/Q chunks,                 Spring Boot 3                ONNX classifier                 ▲          ▲
-  PDW batches)                validation, metrics          DBSCAN deinterleaver            │          │
-                                                           Kalman + Hungarian fusion       │          │
-                                                                                            │          │
- operator ◀──── web (nginx + React) ──/api/ml──▶ ml-service (FastAPI, ONNX, DSP) ──────────┘          │
- console                │                                                                             │
-                        └────────────/api/agent──▶ agent (LangGraph ReAct, 8 tools, MCP) ─────────────┘
-                                                        │ OpenAI-compatible API
-                                                        ▼
+ edge sensors --------------> gateway-java --------------> ml-consumer -----------> detections, spectra, tracks
+ (I/Q chunks,                 Spring Boot 3                ONNX classifier                 ^          ^
+  PDW batches)                validation, metrics          DBSCAN deinterleaver            |          |
+                                                           Kalman + Hungarian fusion       |          |
+                                                                                            |          |
+ operator <---- web (nginx + React) --/api/ml--> ml-service (FastAPI, ONNX, DSP) ----------+          |
+ console                |                                                                             |
+                        +-----------/api/agent--> agent (LangGraph ReAct, 8 tools, MCP) --------------+
+                                                        | OpenAI-compatible API
+                                                        v
                                                   Ollama qwen2.5:7b (local) or hosted LLM
 ```
 

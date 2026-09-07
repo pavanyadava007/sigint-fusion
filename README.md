@@ -6,11 +6,11 @@ deinterleaver; a Kalman/Hungarian fuser builds the Electronic Order of Battle in
 pgvector RAG answers operator questions and writes intelligence reports; a React operator console shows the live picture.
 
 ```
- sensors ──HTTP──▶ gateway (Spring Boot) ──Kafka──▶ ml-consumer (ONNX + DSP + fusion) ──▶ Postgres / pgvector
-                                                                                             ▲        ▲
- operator console (React) ──▶ ml-service (FastAPI)  ◀──────────── agent (LangGraph + RAG + MCP) ──────┘
-                          └──▶ agent /ask                                    │
-                                                                       Ollama qwen2.5:7b (local) or hosted LLM
+ sensors --HTTP--> gateway (Spring Boot) --Kafka--> ml-consumer (ONNX + DSP + fusion) --> Postgres / pgvector
+                                                                                           ^          ^
+ operator console (React) --> ml-service (FastAPI) <------------- agent (LangGraph + RAG + MCP) ------+
+                          +-> agent /ask                                   |
+                                                                     Ollama qwen2.5:7b (local) or hosted LLM
 ```
 
 ## Results
@@ -20,39 +20,39 @@ pgvector RAG answers operator questions and writes intelligence reports; a React
 
 | Experiment | Result |
 |---|---|
-| Pretraining on 2016.10a-layout frames (11 classes, 128 samples, SNR -10..18 dB) | val top-1 80.7 % · -10 dB 23% · -4 dB 74% · 0 dB 90% · 4 dB 92% · 10 dB 92% · 18 dB 92% |
-| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 75.7 % · -10 dB 17% · -4 dB 40% · 0 dB 59% · 4 dB 79% · 10 dB 94% · 20 dB 95% · 30 dB 96% |
+| Pretraining on 2016.10a-layout frames (11 classes, 128 samples, SNR -10..18 dB) | val top-1 80.7 %; -10 dB 23%; -4 dB 74%; 0 dB 90%; 4 dB 92%; 10 dB 92%; 18 dB 92% |
+| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 75.7 %; -10 dB 17%; -4 dB 40%; 0 dB 59%; 4 dB 79%; 10 dB 94%; 20 dB 95%; 30 dB 96% |
 | Same, trained from scratch (no pretraining) | val top-1 74.9 % |
-| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 69.3 % / 63.2 % / 65.8 % · pretrain gain +3.5 pp · BYOL gain -2.7 pp |
-| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 51.4 % / 48.0 % / 46.9 % · pretrain gain +4.5 pp · BYOL gain +1.1 pp |
+| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 69.3 % / 63.2 % / 65.8 %; pretrain gain +3.5 pp; BYOL gain -2.7 pp |
+| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 51.4 % / 48.0 % / 46.9 %; pretrain gain +4.5 pp; BYOL gain +1.1 pp |
 | ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | 48.6 % vs 75.7 % |
 | Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 87.6 % ± 4.3 (chance 33 %); embeddings from scratch model 86.7 %, random init 33.8 % |
-| Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 98.9 % · unseen devices 100.0 % ± 0.1 (chance 25 %) |
+| Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 98.9 %; unseen devices 100.0 % ± 0.1 (chance 25 %) |
 
 **Synthetic RadioML-layout data** (`data/synth_mod.py`: same classes and file layouts, so these are pipeline numbers, NOT RadioML results)
 
 | Experiment | Result |
 |---|---|
-| Pretraining on 2016.10a-layout frames (24 classes, 128 samples, SNR -10..30 dB) | val top-1 47.6 % · -10 dB 16% · -4 dB 24% · 0 dB 37% · 4 dB 50% · 10 dB 49% · 18 dB 57% |
-| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 71.6 % · -10 dB 31% · -4 dB 51% · 0 dB 59% · 4 dB 69% · 10 dB 83% · 20 dB 85% · 30 dB 87% |
+| Pretraining on 2016.10a-layout frames (24 classes, 128 samples, SNR -10..30 dB) | val top-1 47.6 %; -10 dB 16%; -4 dB 24%; 0 dB 37%; 4 dB 50%; 10 dB 49%; 18 dB 57% |
+| Modulation classification, 21 base classes, 1024 samples, SNR -10..30 dB (ResNet-1D, pretrain -> fine-tune) | val top-1 71.6 %; -10 dB 31%; -4 dB 51%; 0 dB 59%; 4 dB 69%; 10 dB 83%; 20 dB 85%; 30 dB 87% |
 | Same, trained from scratch (no pretraining) | val top-1 70.5 % |
-| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 65.3 % / 60.5 % / 59.7 % · pretrain gain +5.6 pp · BYOL gain +0.8 pp |
-| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 49.1 % / 43.2 % / 40.7 % · pretrain gain +8.4 pp · BYOL gain +2.5 pp |
+| Data efficiency at 10 % of training data: pretrained / BYOL / scratch | 65.3 % / 60.5 % / 59.7 %; pretrain gain +5.6 pp; BYOL gain +0.8 pp |
+| Data efficiency at 1 % of training data: pretrained / BYOL / scratch | 49.1 % / 43.2 % / 40.7 %; pretrain gain +8.4 pp; BYOL gain +2.5 pp |
 | ViT-tiny on STFT spectrogram vs ResNet-1D (same split) | 50.5 % vs 71.6 % |
 | Few-shot novel modulations (5-shot, 3 unseen classes: 32APSK, 128QAM, OQPSK, 50 episodes) | 78.3 % ± 3.8 (chance 33 %); embeddings from scratch model 80.2 %, random init 34.3 % |
-| Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 56.1 % · unseen devices 79.2 % ± 2.2 (chance 25 %) |
+| Specific emitter identification (synthetic_fingerprints, 12 train devices, 4 unseen, 5-shot) | base val 56.1 %; unseen devices 79.2 % ± 2.2 (chance 25 %) |
 
 **Platform, retrieval, agent** (measured on the live stack)
 
 | Experiment | Result |
 |---|---|
-| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 86.5 % ± 0.3 / 86.9 % ± 0.5 / 71.1 % ± 0.7 · transfer gain -0.4 pp (chance 9 %) |
-| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 71.7 % ± 1.1 / 75.8 % ± 0.8 / 66.1 % ± 0.9 · transfer gain -4.1 pp (chance 9 %) |
-| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 85.6 % ± 0.5 / 86.6 % ± 0.4 / 75.0 % ± 0.3 · transfer gain -1.1 pp (chance 9 %) |
-| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 76.7 % ± 0.2 / 75.5 % ± 1.0 / 69.8 % ± 0.5 · transfer gain +1.2 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 86.5 % ± 0.3 / 86.9 % ± 0.5 / 71.1 % ± 0.7; transfer gain -0.4 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: synthetic-pretrained / scratch / frozen linear probe | 71.7 % ± 1.1 / 75.8 % ± 0.8 / 66.1 % ± 0.9; transfer gain -4.1 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 9900 train frames = 100 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 85.6 % ± 0.5 / 86.6 % ± 0.4 / 75.0 % ± 0.3; transfer gain -1.1 pp (chance 9 %) |
+| REAL RadioML 2016.10a frames (HF mirror, single 6 dB slice, 11 classes, 990 train frames = 10 %), test acc over 3 seeds: real-2016.10a-pretrained (CAVEAT: the mirror slice is likely drawn from 2016.10a, so its test frames may overlap the pretraining split; indicative only) / scratch / frozen linear probe | 76.7 % ± 0.2 / 75.5 % ± 1.0 / 69.8 % ± 0.5; transfer gain +1.2 pp (chance 9 %) |
 | PDW deinterleaving (synthetic, 4 emitters, DBSCAN) | purity 1.00 / completeness 1.00 (tests/test_core.py) |
-| /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU, real-data model | end-to-end p50 110.36 ms · p95 232.12 ms · p99 311.77 ms · 251.3 req/s · model-only p50 1.48 ms |
-| RAG retrieval, 53 questions, 37 chunks (BAAI/bge-small-en-v1.5) | hybrid hit@5 100.0 % · MRR 0.93 · dense-only hit@5 98.1 % |
+| /classify latency, 32 concurrent, n=2000, docker python:3.12-slim, CPU ONNX Runtime, 2 uvicorn workers, host 32 vCPU, real-data model | end-to-end p50 110.36 ms; p95 232.12 ms; p99 311.77 ms; 251.3 req/s; model-only p50 1.48 ms |
+| RAG retrieval, 53 questions, 37 chunks (BAAI/bge-small-en-v1.5) | hybrid hit@5 100.0 %; MRR 0.93; dense-only hit@5 98.1 % |
 | Agent task success (10 tasks, qwen2.5:7b) | 10/10 = 100.0 % |
 
 Every number is written by a script into a results JSON with provenance (dataset path, synthetic flag, GPU, seed, git commit) and rendered from there; nothing in these tables is typed by hand.
