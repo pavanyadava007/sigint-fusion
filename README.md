@@ -142,3 +142,11 @@ container, a tiny CPU training smoke of all three train modes, the Java build wi
   The synthetic channel model is therefore not a substitute for the licensed data; `train_hf_rml2016.py` documents the gap.
 
 See [docs/architecture.md](docs/architecture.md) for the ADRs and [docs/api.md](docs/api.md) for the HTTP contract.
+
+## Data and model licence notice
+
+The RadioML 2016.10a and 2018.01A datasets are copyright DeepSig Inc. and licensed CC BY-NC-SA 4.0; they are not part of this
+repository (register at deepsig.ai to obtain them). The shipped model weights (`ml-service/ckpt/ft.onnx`) were trained on
+RadioML 2018.01A and the browser demo bundles 320 attributed frames from it (`web/public/demo/`); both are therefore shared
+under the same CC BY-NC-SA 4.0 terms, for non-commercial use with attribution to DeepSig Inc. Everything else in the
+repository is original work by Pavan Yadav Annappa.
