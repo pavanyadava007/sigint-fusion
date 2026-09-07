@@ -67,7 +67,8 @@ flag, GPU, seed, git commit) and rendered from there; nothing in the tables is t
 - Console: https://huggingface.co/spaces/pavanyadava07/sigint-fusion (static Space; the same React app in browser mode: ONNX
   classifier via onnxruntime-web, DSP, sensor scenario on real RadioML frames, fusion and knowledge base all run in the tab)
 - Analyst backend: https://huggingface.co/spaces/pavanyadava07/sigint-fusion-agent (Qwen2.5-7B-Instruct on ZeroGPU; the console
-  sends it the gathered evidence and shows its answer; first request after idle takes 30 to 90 s; rule-based fallback when asleep)
+  sends it the gathered evidence and shows its answer; first request after idle takes 30 to 90 s; ZeroGPU quota is per visitor,
+  and when the Space is asleep or the quota is used up the console answers rule-based from the same evidence and says so)
 - Source: https://github.com/pavanyadava007/sigint-fusion
 
 Publish: `python scripts/publish_hf.py` (console) and upload `deploy/hf_space_agent/` (backend). `make up` runs the full stack
