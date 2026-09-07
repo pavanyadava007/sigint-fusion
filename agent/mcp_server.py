@@ -1,4 +1,4 @@
-"""Expose the analyst tools over MCP (stdio) so any MCP client (Claude Desktop, IDEs) can drive the fusion system. python mcp_server.py"""
+"""Expose the analyst tools over MCP (stdio) so any MCP client (desktop assistants, IDEs) can drive the fusion system. python mcp_server.py"""
 
 from mcp.server.fastmcp import FastMCP
 
