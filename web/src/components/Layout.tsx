@@ -5,6 +5,10 @@ import { applyTheme, readTheme, type Theme } from '../lib/theme';
 import { chipLabel, useHealth, type ChipState } from '../hooks/useHealth';
 import { IconChat, IconGrid, IconMark, IconMoon, IconRadar, IconServer, IconSun, IconWave } from './Icons';
 
+const BROWSER_MODE = import.meta.env.MODE === 'browser';
+const DEMO_NOTE =
+  'Browser demo: classifier, DSP, fusion and knowledge base run in this tab on real RadioML frames; the analyst uses Qwen2.5-7B on a ZeroGPU Space (30-90 s cold start, rule-based fallback when asleep).';
+
 const NAV = [
   { to: '/', label: 'Overview', icon: IconGrid, end: true },
   { to: '/emitters', label: 'Emitters', icon: IconRadar },
@@ -46,7 +50,7 @@ export function Layout() {
     : 'LLM status is reported by the agent; agent unreachable';
 
   return (
-    <div className="shell">
+    <div className={`shell ${BROWSER_MODE ? 'has-strip' : ''}`}>
       <aside className="rail">
         <div className="brand">
           <IconMark className="brand-mark" />
@@ -89,6 +93,11 @@ export function Layout() {
           {theme === 'dark' ? <IconSun /> : <IconMoon />}
         </button>
       </header>
+      {BROWSER_MODE && (
+        <div className="demo-strip" role="note" title={DEMO_NOTE}>
+          {DEMO_NOTE}
+        </div>
+      )}
       <main className="main" id="main">
         <Outlet />
       </main>

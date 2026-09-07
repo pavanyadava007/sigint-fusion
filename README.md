@@ -62,6 +62,17 @@ The full run log with per-SNR curves, few-shot episodes, retrieval misses and pe
 [docs/results.md](docs/results.md). Every number is written by a script into a JSON file with provenance (dataset, synthetic
 flag, GPU, seed, git commit) and rendered from there; nothing in the tables is typed by hand.
 
+## Live demo
+
+- Console: https://huggingface.co/spaces/pavanyadava07/sigint-fusion (static Space; the same React app in browser mode: ONNX
+  classifier via onnxruntime-web, DSP, sensor scenario on real RadioML frames, fusion and knowledge base all run in the tab)
+- Analyst backend: https://huggingface.co/spaces/pavanyadava07/sigint-fusion-agent (Qwen2.5-7B-Instruct on ZeroGPU; the console
+  sends it the gathered evidence and shows its answer; first request after idle takes 30 to 90 s; rule-based fallback when asleep)
+- Source: https://github.com/pavanyadava007/sigint-fusion
+
+Publish: `python scripts/publish_hf.py` (console) and upload `deploy/hf_space_agent/` (backend). `make up` runs the full stack
+locally with Kafka, Postgres, the Java gateway and a local Ollama LLM instead.
+
 ## Operator console
 
 Live stack: 7-emitter scenario observed by 3 COMINT sensors streaming real RadioML 2018.01A frames and 1 R-ESM sensor, classified by the real-data model, qwen2.5:7b on the local GPU.

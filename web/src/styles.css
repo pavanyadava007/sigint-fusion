@@ -125,6 +125,22 @@ textarea {
   grid-template-rows: var(--top-h) 1fr;
   height: 100%;
 }
+.shell.has-strip {
+  grid-template-rows: var(--top-h) auto 1fr;
+}
+.shell.has-strip .rail {
+  grid-row: 1 / 4;
+}
+.demo-strip {
+  padding: 4px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--muted);
+  min-width: 0;
+}
 .rail {
   grid-row: 1 / 3;
   background: var(--surface);
