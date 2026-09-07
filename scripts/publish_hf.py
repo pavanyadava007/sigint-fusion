@@ -27,7 +27,7 @@ colorTo: blue
 sdk: static
 pinned: false
 license: other
-short_description: Browser demo of the SIGINT-Fusion operator console (ONNX classifier in-browser)
+short_description: SIGINT-Fusion operator console, fully in the browser
 ---
 
 # SIGINT-Fusion operator console (browser demo)
@@ -35,10 +35,14 @@ short_description: Browser demo of the SIGINT-Fusion operator console (ONNX clas
 The operator console of [SIGINT-Fusion](https://github.com/pavanyadava007/sigint-fusion) running entirely in your browser:
 the ResNet-1D modulation classifier (trained on DeepSig RadioML 2018.01A, served with onnxruntime-web), Welch PSD, CFAR
 detection, STFT spectrogram, DBSCAN pulse deinterleaving, Kalman/Hungarian emitter fusion, a sensor scenario streaming real
-RadioML frames, and a retrieval-based analyst over the knowledge base.
+RadioML frames, and the analyst: the console gathers the evidence (catalogue matches, knowledge-base passages, live
+detections and fused tracks) and sends it to a companion ZeroGPU Space running Qwen2.5-7B-Instruct
+([pavanyadava07/sigint-fusion-agent](https://huggingface.co/spaces/pavanyadava07/sigint-fusion-agent)) which writes the
+grounded answer or report. When that Space is asleep or out of quota, a rule-based analyst answers from the same evidence
+and the reply says so.
 
-What is different from the full stack: no Kafka, no Postgres, no Java gateway, and no LLM. The analyst here is rule and
-retrieval based; the full platform runs a LangGraph agent on a local qwen2.5:7b. See the repository for the measured results.
+What is different from the full stack: no Kafka, no Postgres, no Java gateway; the LLM runs on a shared ZeroGPU Space
+(first request after idle takes 30 to 60 s) instead of a local Ollama. See the repository for the measured results.
 
 Data notice: the bundled I/Q frames (320 frames, 8 modulations) are from DeepSig RadioML 2018.01A, licensed
 CC BY-NC-SA 4.0 by DeepSig Inc.; the bundled model weights were trained on that data and are shared under the same terms.
